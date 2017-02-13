@@ -2,36 +2,18 @@ package tech.oom.julian.utils;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Environment;
-import android.os.ParcelFileDescriptor;
-import android.provider.MediaStore;
-import android.text.TextUtils;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.util.Patterns;
 import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
 import android.widget.Toast;
-
-import com.clover_studio.spikachatmodule.api.DownloadFileManager;
-import com.clover_studio.spikachatmodule.base.BaseActivity;
-import com.clover_studio.spikachatmodule.base.SingletonLikeApp;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -106,7 +88,7 @@ public class Tools {
      * @param os output stream
      * @param length length of stream
      */
-    public static void copyStream(InputStream is, OutputStream os, long length, /*DownloadFileManager.OnDownloadListener listener*/) {
+    public static void copyStream(InputStream is, OutputStream os, long length /*DownloadFileManager.OnDownloadListener listener*/) {
         final int buffer_size = 1024;
         int totalLen = 0;
         try {
