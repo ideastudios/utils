@@ -1,4 +1,4 @@
-package tech.oom.julian.luckPan;
+package com.pingan.crowdsourcing.business.task.lottery.luckPan;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -10,45 +10,30 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.support.annotation.ColorInt;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
-
 import com.pingan.crowdsourcing.R;
 import com.pingan.crowdsourcing.common.util.ComDensityUtil;
-
 import java.util.ArrayList;
 import java.util.List;
 
-
+import tech.oom.julian.luckPan.LuckBean;
+import tech.oom.julian.luckPan.LuckItemInfo;
+import tech.oom.julian.luckPan.LuckPanListener;
 
 
 public class NewLuckView extends View {
-
-
-    private LuckBean mLuckBean;
-
-    private boolean isRolling;
-
-    private int radius;
-
-    private int firstAngle = 0;
-
-    /**
-     * 转盘所有图片的bitmap集合
-     */
-    private List<Bitmap> bitmaps = new ArrayList<>();
-
 
 
     /**
      * 默认显示奖品字体大小
      */
     private final float default_text_size;
-
     /**
      * 默认显示奖品的字体颜色
      */
@@ -68,20 +53,30 @@ public class NewLuckView extends View {
     /**
      * 默认奖品图片的宽度占转盘宽度的比
      */
-    private final float defaultWidthRatio =  1f / 8;
-    /**
-     * 默认奖品图片的高度占转盘高度度的比
-     */
-    private float defaultHeightRatio = 1f / 8;
+    private final float defaultWidthRatio = 1f / 8;
     /**
      * 默认奖品图片距离圆心的偏移长度占圆盘半径长度的比
      */
     private final float defaultItemOffsetRatio = 3f / 5;
-
     private final float defaultIndicatorWidthRatio = 1f / 5;
     private final float defaultIndicatorHeightRatio = 1f / 5;
-    private final int  defaultCycleInMilliseconds = 800;
+    private final int defaultCycleInMilliseconds = 800;
 
+    private RectF luckViewRect = new RectF();
+    private RectF indicatorRect = new RectF();
+
+    private LuckBean mLuckBean;
+    private boolean isRolling;
+    private int radius;
+    private int firstAngle = 0;
+    /**
+     * 转盘所有图片的bitmap集合
+     */
+    private List<Bitmap> bitmaps = new ArrayList<>();
+    /**
+     * 默认奖品图片的高度占转盘高度度的比
+     */
+    private float defaultHeightRatio = 1f / 8;
     /**
      * 控件的最小长宽
      */
@@ -97,7 +92,7 @@ public class NewLuckView extends View {
 
     private float textOffsetRatio;
     private TextPaint textPaint;
-    private  int oddSectorColor;
+    private int oddSectorColor;
     private int evenSectorColor;
     private Paint oddSectorPaint;
     private Paint evenSectorPaint;
@@ -110,18 +105,19 @@ public class NewLuckView extends View {
     private Bitmap indicatorBitmap;
     private int cycleInMilliseconds;
     private ValueAnimator animator;
+    private LuckViewListener luckViewListener;
 
     public NewLuckView(Context context) {
-        this(context,null);
+        this(context, null);
     }
 
     public NewLuckView(Context context, AttributeSet attrs) {
-        this(context, attrs,0);
+        this(context, attrs, 0);
     }
 
     public NewLuckView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        default_text_size = ComDensityUtil.dip2px(context,14);
+        default_text_size = ComDensityUtil.dip2px(context, 14);
         min_size = ComDensityUtil.dip2px(context, 200);
         final TypedArray attributes = context.getTheme().obtainStyledAttributes(attrs, R.styleable.NewLuckView, defStyleAttr, 0);
         initByAttributes(attributes);
@@ -130,20 +126,19 @@ public class NewLuckView extends View {
     }
 
 
-
     private void initByAttributes(TypedArray attributes) {
         textSize = attributes.getDimension(R.styleable.NewLuckView_luck_text_size, default_text_size);
-        textColor = attributes.getColor(R.styleable.NewLuckView_luck_text_color,default_text_color);
-        textOffsetRatio = attributes.getFloat(R.styleable.NewLuckView_luck_text_offset_ratio,defaultTextOffsetRatio);
+        textColor = attributes.getColor(R.styleable.NewLuckView_luck_text_color, default_text_color);
+        textOffsetRatio = attributes.getFloat(R.styleable.NewLuckView_luck_text_offset_ratio, defaultTextOffsetRatio);
         oddSectorColor = attributes.getColor(R.styleable.NewLuckView_luck_odd_sector_color, default_odd_sector_color);
         evenSectorColor = attributes.getColor(R.styleable.NewLuckView_luck_even_sector_color, default_even_sector_color);
-        itemWidthRatio = attributes.getFloat(R.styleable.NewLuckView_luck_item_width_ratio,defaultWidthRatio);
-        itemHeightRatio = attributes.getFloat(R.styleable.NewLuckView_luck_item_height_ratio,defaultHeightRatio);
-        itemOffsetRatio = attributes.getFloat(R.styleable.NewLuckView_luck_item_offset_ratio,defaultItemOffsetRatio);
-        indicatorResourceId = attributes.getResourceId(R.styleable.NewLuckView_luck_indicator_drawable,0);
-        indicatorWidthRatio = attributes.getFloat(R.styleable.NewLuckView_luck_indicator_width_ratio,defaultIndicatorWidthRatio);
-        indicatorHeightRatio = attributes.getFloat(R.styleable.NewLuckView_luck_indicator_height_ratio,defaultIndicatorHeightRatio);
-        cycleInMilliseconds = attributes.getInteger(R.styleable.NewLuckView_luck_cycle_millis,defaultCycleInMilliseconds);
+        itemWidthRatio = attributes.getFloat(R.styleable.NewLuckView_luck_item_width_ratio, defaultWidthRatio);
+        itemHeightRatio = attributes.getFloat(R.styleable.NewLuckView_luck_item_height_ratio, defaultHeightRatio);
+        itemOffsetRatio = attributes.getFloat(R.styleable.NewLuckView_luck_item_offset_ratio, defaultItemOffsetRatio);
+        indicatorResourceId = attributes.getResourceId(R.styleable.NewLuckView_luck_indicator_drawable, 0);
+        indicatorWidthRatio = attributes.getFloat(R.styleable.NewLuckView_luck_indicator_width_ratio, defaultIndicatorWidthRatio);
+        indicatorHeightRatio = attributes.getFloat(R.styleable.NewLuckView_luck_indicator_height_ratio, defaultIndicatorHeightRatio);
+        cycleInMilliseconds = attributes.getInteger(R.styleable.NewLuckView_luck_cycle_millis, defaultCycleInMilliseconds);
     }
 
     private void initPainters() {
@@ -167,17 +162,137 @@ public class NewLuckView extends View {
 
     /**
      * 设置相应的实体类
+     *
      * @param bean
      */
-    public void loadData(LuckBean bean,List<Bitmap> bitmaps) {
+    public void loadData(LuckBean bean, List<Bitmap> bitmaps) {
         mLuckBean = bean;
         this.bitmaps.addAll(bitmaps);
         invalidate();
     }
 
-    public void setIndicator(Bitmap indicatorBitmap){
+    /**
+     * 设置抽奖指针的bitmap
+     *
+     * @param indicatorBitmap
+     */
+    public void setIndicator(Bitmap indicatorBitmap) {
         this.indicatorBitmap = indicatorBitmap;
         invalidate();
+    }
+
+    /**
+     * 设置奇数扇形区域的颜色
+     *
+     * @param color
+     */
+    public void setOddSectorColor(@ColorInt int color) {
+        oddSectorColor = color;
+        invalidateNow();
+    }
+
+    /**
+     * 设置偶数扇形区域的颜色
+     *
+     * @param color
+     */
+    public void setEvenSectorColor(@ColorInt int color) {
+        evenSectorColor = color;
+        invalidateNow();
+    }
+
+    /**
+     * 设置奖项文字颜色
+     *
+     * @param color
+     */
+    public void setItemTextColor(@ColorInt int color) {
+        textColor = color;
+        invalidateNow();
+    }
+
+    /**
+     * 设置奖项文字大小
+     *
+     * @param size
+     */
+    public void setItemTextSize(float size) {
+        textSize = size;
+        invalidateNow();
+    }
+
+    public float getTextOffsetRatio() {
+        return textOffsetRatio;
+    }
+
+    public void setTextOffsetRatio(float textOffsetRatio) {
+        this.textOffsetRatio = textOffsetRatio;
+    }
+
+    public float getItemWidthRatio() {
+        return itemWidthRatio;
+    }
+
+    public void setItemWidthRatio(float itemWidthRatio) {
+        this.itemWidthRatio = itemWidthRatio;
+    }
+
+    public float getItemHeightRatio() {
+        return itemHeightRatio;
+    }
+
+    public void setItemHeightRatio(float itemHeightRatio) {
+        this.itemHeightRatio = itemHeightRatio;
+    }
+
+    public float getItemOffsetRatio() {
+        return itemOffsetRatio;
+    }
+
+    public void setItemOffsetRatio(float itemOffsetRatio) {
+        this.itemOffsetRatio = itemOffsetRatio;
+    }
+
+    public float getIndicatorWidthRatio() {
+        return indicatorWidthRatio;
+    }
+
+    public void setIndicatorWidthRatio(float indicatorWidthRatio) {
+        this.indicatorWidthRatio = indicatorWidthRatio;
+    }
+
+    public float getIndicatorHeightRatio() {
+        return indicatorHeightRatio;
+    }
+
+    public void setIndicatorHeightRatio(float indicatorHeightRatio) {
+        this.indicatorHeightRatio = indicatorHeightRatio;
+    }
+
+    public int getCycleInMilliseconds() {
+        return cycleInMilliseconds;
+    }
+
+    public void setCycleInMilliseconds(int cycleInMilliseconds) {
+        this.cycleInMilliseconds = cycleInMilliseconds;
+    }
+
+    /**
+     * 如果改变相应配置  需要刷新相应属性
+     */
+    public void invalidateNow() {
+        initPainters();
+        invalidate();
+    }
+
+    public Bitmap getIndicatorBitmap() {
+        if (indicatorBitmap == null) {
+            if (indicatorResourceId != 0) {
+                return BitmapFactory.decodeResource(getResources(), indicatorResourceId);
+            }
+        }
+        return indicatorBitmap;
+
     }
 
 
@@ -191,47 +306,50 @@ public class NewLuckView extends View {
 
         int MinValue = Math.min(getWidth(), getHeight());
         radius = MinValue / 2;
-        RectF rectF = new RectF(0, 0, MinValue, MinValue);
-
+//        RectF rectF = new RectF(0, 0, MinValue, MinValue);
+        luckViewRect.set(0, 0, MinValue, MinValue);
         int size = mLuckBean.details.size();
         int sectorAnger = (int) (360 / size + 0.5f);
         int startAngle = (int) (270 - sectorAnger / 2 + 0.5f) + firstAngle;
         for (int i = 0; i < size; i++) {
             if (i % 2 == 0) {
-                canvas.drawArc(rectF, startAngle, sectorAnger, true, oddSectorPaint);
+                canvas.drawArc(luckViewRect, startAngle, sectorAnger, true, oddSectorPaint);
             } else {
-                canvas.drawArc(rectF, startAngle, sectorAnger, true, evenSectorPaint);
+                canvas.drawArc(luckViewRect, startAngle, sectorAnger, true, evenSectorPaint);
             }
             startAngle += sectorAnger;
         }
         canvas.translate(radius, radius);
-        RectF rect = new RectF(-indicatorWidthRatio * radius, (-indicatorHeightRatio) * radius, indicatorWidthRatio * radius, (indicatorHeightRatio) * radius);
-        if(indicatorBitmap != null){
-            canvas.drawBitmap(indicatorBitmap, null, rect, null);
-        }else {
-            if(indicatorResourceId != 0 ){
-                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), indicatorResourceId);
-                canvas.drawBitmap(bitmap, null, rect, null);
-            }
-        }
+//        RectF rect = new RectF(-indicatorWidthRatio * radius, (-indicatorHeightRatio) * radius, indicatorWidthRatio * radius, (indicatorHeightRatio) * radius);
+        indicatorRect.set(-getIndicatorWidthRatio() * radius, (-getIndicatorHeightRatio()) * radius, getIndicatorWidthRatio() * radius, (getIndicatorHeightRatio()) * radius);
+//        if (indicatorBitmap != null) {
+//            canvas.drawBitmap(indicatorBitmap, null, indicatorRect, null);
+//        } else {
+//            if (indicatorResourceId != 0) {
+//                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), indicatorResourceId);
+//                canvas.drawBitmap(bitmap, null, indicatorRect, null);
+//            }
+//        }
+
+        canvas.drawBitmap(getIndicatorBitmap(), null, indicatorRect, null);
         int rotatedDegree = firstAngle;
         canvas.rotate(firstAngle);
         for (int i = 0; i < size; i++) {
             LuckItemInfo luckItemInfo = mLuckBean.details.get(i);
-            drawText(canvas,luckItemInfo.prize_name);
-            drawIcon(canvas,bitmaps.get(i));
+            drawText(canvas, luckItemInfo.prize_name);
+            drawIcon(canvas, bitmaps.get(i));
             rotatedDegree += sectorAnger;
             canvas.rotate(sectorAnger);
         }
 
     }
 
-    private void drawText(Canvas mCanvas,String drawText){
-        mCanvas.drawText(drawText, 0, -radius * textOffsetRatio, textPaint);
+    private void drawText(Canvas mCanvas, String drawText) {
+        mCanvas.drawText(drawText, 0, -radius * getTextOffsetRatio(), textPaint);
     }
 
-    private void drawIcon(Canvas mCanvas,Bitmap bitmap) {
-        RectF rect = new RectF(-itemWidthRatio * radius, (-itemHeightRatio + (-itemOffsetRatio)) * radius, itemWidthRatio * radius, (itemHeightRatio + (-itemOffsetRatio)) * radius);
+    private void drawIcon(Canvas mCanvas, Bitmap bitmap) {
+        RectF rect = new RectF(-getItemWidthRatio() * radius, (-getItemHeightRatio() + (-getItemOffsetRatio())) * radius, getItemWidthRatio() * radius, (getItemHeightRatio() + (-getItemOffsetRatio())) * radius);
         mCanvas.drawBitmap(bitmap, null, rect, null);
     }
 
@@ -288,11 +406,11 @@ public class NewLuckView extends View {
     }
 
     private void startRolling() {
-        if(isRolling){
+        if (isRolling) {
             return;
         }
-        animator = ValueAnimator.ofInt(0,360);
-        animator.setDuration(cycleInMilliseconds);
+        animator = ValueAnimator.ofInt(0, 360);
+        animator.setDuration(getCycleInMilliseconds());
         animator.setRepeatCount(ValueAnimator.INFINITE);
         animator.setRepeatMode(ValueAnimator.RESTART);
         animator.setInterpolator(new LinearInterpolator());
@@ -304,19 +422,25 @@ public class NewLuckView extends View {
             }
         });
         animator.start();
+        if (luckViewListener != null) {
+            luckViewListener.onStart();
+        }
         isRolling = true;
     }
 
-    public void setStop(int index){
-        int size= mLuckBean.details.size();
-        if(index < 0 || index >= size){
+    public void setStop(int index) {
+        int size = mLuckBean.details.size();
+        if (index < 0 || index >= size) {
             animator.cancel();
             return;
         }
         int sectorAnger = (int) (360 / size + 0.5f);
-        animator.setIntValues(firstAngle,360+(size - index)*sectorAnger);
+        animator.setIntValues(firstAngle, 360 + (size - index) * sectorAnger);
         animator.setInterpolator(new DecelerateInterpolator());
         animator.setRepeatCount(1);
+        if (luckViewListener != null) {
+            luckViewListener.onStop(index);
+        }
         isRolling = false;
 
     }
@@ -331,7 +455,9 @@ public class NewLuckView extends View {
 
     }
 
-
+    public void setLuckViewListener(LuckViewListener luckViewListener) {
+        this.luckViewListener = luckViewListener;
+    }
 
 
     @Override
@@ -364,7 +490,12 @@ public class NewLuckView extends View {
         }
     }
 
+    public interface LuckViewListener {
 
+        void onStart();
+
+        void onStop(int index);
+    }
 
 
 }
