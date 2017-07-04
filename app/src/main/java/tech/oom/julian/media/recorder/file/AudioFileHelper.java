@@ -7,8 +7,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import tech.oom.record2.recorder.VoiceRecorder;
-import tech.oom.record2.utils.Log;
+import tech.oom.julian.media.recorder.recorder.VoiceRecorder;
+import tech.oom.julian.media.recorder.utils.Log;
+
 
 /**
  * Created by issuser on 2017/6/8 0008.

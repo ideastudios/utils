@@ -7,11 +7,11 @@ import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 
-import tech.oom.record2.file.AudioFileHelper;
-import tech.oom.record2.file.AudioFileListener;
-import tech.oom.record2.recorder.VoiceRecorder;
-import tech.oom.record2.recorder.VoiceRecorderCallback;
-import tech.oom.record2.utils.BytesTransUtil;
+import tech.oom.julian.media.recorder.file.AudioFileHelper;
+import tech.oom.julian.media.recorder.file.AudioFileListener;
+import tech.oom.julian.media.recorder.recorder.VoiceRecorder;
+import tech.oom.julian.media.recorder.recorder.VoiceRecorderCallback;
+import tech.oom.julian.media.recorder.utils.BytesTransUtil;
 
 /**
  * Created by issuser on 2017/6/13 0013.
