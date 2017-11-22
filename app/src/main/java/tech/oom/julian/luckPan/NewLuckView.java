@@ -1,4 +1,4 @@
-package com.pingan.crowdsourcing.business.task.lottery.luckPan;
+package tech.oom.julian.luckPan;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -17,14 +17,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
-import com.pingan.crowdsourcing.R;
-import com.pingan.crowdsourcing.common.util.ComDensityUtil;
 import java.util.ArrayList;
 import java.util.List;
 
 import tech.oom.julian.luckPan.LuckBean;
 import tech.oom.julian.luckPan.LuckItemInfo;
 import tech.oom.julian.luckPan.LuckPanListener;
+import tech.oom.julian.utils.R;
 
 
 public class NewLuckView extends View {
