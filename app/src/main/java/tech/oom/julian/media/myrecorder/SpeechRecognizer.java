@@ -330,12 +330,12 @@ public class SpeechRecognizer implements VoiceRecorderCallback, AudioFileListene
     public boolean onRecorderReady() {
         if (!isRecordAudioPermissionGranted()) {
             Log.e("SpeechRecognizer", "set recorder failed,because no RECORD_AUDIO permission was granted");
-            onRecordedFail(SdkConst.RecorderErrorCode.RECORDER_PERMISSION_ERROR);
+            onRecordedFail(Const.RecorderErrorCode.RECORDER_PERMISSION_ERROR);
 //            runOnUIThread(new Runnable() {
 //                @Override
 //                public void run() {
 //                    if (stageListener != null) {
-//                        stageListener.onRecordError(SdkConst.RecorderErrorCode.RECORDER_PERMISSION_ERROR, "没有录音权限或已被占用");
+//                        stageListener.onRecordError(Const.RecorderErrorCode.RECORDER_PERMISSION_ERROR, "没有录音权限或已被占用");
 //                        stageListener.onRecordError("没有录音权限哦");
 //                    }
 //                }
@@ -447,13 +447,13 @@ public class SpeechRecognizer implements VoiceRecorderCallback, AudioFileListene
             public void run() {
                 String errorMsg = "";
                 switch (paramInt) {
-                    case SdkConst.RecorderErrorCode.RECORDER_EXCEPTION_OCCUR:
+                    case Const.RecorderErrorCode.RECORDER_EXCEPTION_OCCUR:
                         errorMsg = "启动或录音时抛出异常Exception";
                         break;
-                    case SdkConst.RecorderErrorCode.RECORDER_READ_ERROR:
+                    case Const.RecorderErrorCode.RECORDER_READ_ERROR:
                         errorMsg = "Recorder.read() 过程中发生错误";
                         break;
-                    case SdkConst.RecorderErrorCode.RECORDER_PERMISSION_ERROR:
+                    case Const.RecorderErrorCode.RECORDER_PERMISSION_ERROR:
                         errorMsg = "当前应用没有录音权限或者录音功能被占用";
                         break;
                     default:

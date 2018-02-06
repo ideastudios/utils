@@ -4,7 +4,7 @@ package tech.oom.julian.media.myrecorder;
  * SDK的相关常量
  */
 
-public class SdkConst {
+public class Const {
     /**
      *获取speechText时的类型
      */

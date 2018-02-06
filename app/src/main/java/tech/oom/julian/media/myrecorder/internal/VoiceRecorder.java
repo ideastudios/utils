@@ -2,7 +2,7 @@ package tech.oom.julian.media.myrecorder.internal;
 
 import android.media.AudioRecord;
 
-import tech.oom.julian.media.myrecorder.SdkConst;
+import tech.oom.julian.media.myrecorder.Const;
 import tech.oom.julian.media.myrecorder.internal.record.VoiceRecorderCallback;
 import tech.oom.julian.media.myrecorder.internal.utils.Log;
 
@@ -29,14 +29,14 @@ public class VoiceRecorder {
                     mAudioRecorder.startRecording();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    recordFailed(SdkConst.RecorderErrorCode.RECORDER_EXCEPTION_OCCUR);
+                    recordFailed(Const.RecorderErrorCode.RECORDER_EXCEPTION_OCCUR);
                     mAudioRecorder = null;
                 }
             }
             if ((mAudioRecorder != null) &&
                     (mAudioRecorder.getState() == 1) && (mAudioRecorder.getRecordingState() == 1)) {
                 Log.e("VoiceRecorder", "no recorder permission or recorder is not available right now");
-                recordFailed(SdkConst.RecorderErrorCode.RECORDER_PERMISSION_ERROR);
+                recordFailed(Const.RecorderErrorCode.RECORDER_PERMISSION_ERROR);
                 mAudioRecorder = null;
             }
             for (int i = 0; i < 2; i++) {
@@ -53,12 +53,12 @@ public class VoiceRecorder {
 
                 } catch (Exception e) {
                     isRecord = false;
-                    recordFailed(SdkConst.RecorderErrorCode.RECORDER_EXCEPTION_OCCUR);
+                    recordFailed(Const.RecorderErrorCode.RECORDER_EXCEPTION_OCCUR);
                 }
                 if (nLen == wave.length) {
                     mCallback.onRecorded(wave);
                 } else {
-                    recordFailed(SdkConst.RecorderErrorCode.RECORDER_READ_ERROR);
+                    recordFailed(Const.RecorderErrorCode.RECORDER_READ_ERROR);
                     isRecord = false;
                 }
             }
@@ -143,7 +143,7 @@ public class VoiceRecorder {
                 mAudioRecorder = new AudioRecord(aSource, sRate, channel, aFormat, bufferSize);
                 if (mAudioRecorder.getState() != 1) {
                     mAudioRecorder = null;
-                    recordFailed(SdkConst.RecorderErrorCode.RECORDER_PERMISSION_ERROR);
+                    recordFailed(Const.RecorderErrorCode.RECORDER_PERMISSION_ERROR);
                     Log.e("VoiceRecorder", "AudioRecord initialization failed,because of no RECORD permission or unavailable AudioRecord ");
                     throw new Exception("AudioRecord initialization failed");
                 }
